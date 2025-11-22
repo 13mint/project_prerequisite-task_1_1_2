@@ -14,8 +14,9 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    public void saveUser(String name, String lastName, byte age) {
+    public User saveUser(String name, String lastName, byte age) {
 
+        return null;
     }
 
     public void removeUserById(long id) {
