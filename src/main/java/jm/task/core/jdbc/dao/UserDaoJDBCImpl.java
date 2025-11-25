@@ -6,6 +6,7 @@ import jm.task.core.jdbc.util.Util;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +16,22 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void createUsersTable() {
+        String sql = "CREATE TABLE IF NOT EXISTS users (" +
+                "id BIGINT PRIMARY KEY AUTO_INCREMENT, " +
+                "name VARCHAR(50) NOT NULL, " +
+                "last_name VARCHAR(50) NOT NULL, " +
+                "age TINYINT NOT NULL" +
+                ")";
 
+        try (Connection connection = Util.getConnection();
+             Statement statement = connection.createStatement()) {
+
+            statement.executeUpdate(sql);
+            System.out.println("Таблица users успешно создана!");
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при создании таблицы: " + e.getMessage(), e);
+        }
     }
 
     public void dropUsersTable() {
@@ -23,10 +39,10 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        String sql = "INSERT INTO users (name, last_name, age) VALUES (?, ?, ?)";
+
+        String sql = "INSERT INTO users (name, lastName, age) VALUES (?, ?, ?)";
         try(Connection connection = Util.getConnection();
         ) {
-            assert connection != null;
             try(PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ) {
                 preparedStatement.setString(1, name);
@@ -35,7 +51,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
                 preparedStatement.executeUpdate();
 
-                System.out.println("User save success.");
+                System.out.println("Пользователь с именем - " + name + " добавлен в базу данных");
 
             }
         } catch (SQLException e) {
