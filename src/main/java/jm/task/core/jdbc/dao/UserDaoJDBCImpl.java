@@ -3,10 +3,7 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +16,7 @@ public class UserDaoJDBCImpl implements UserDao {
         String sql = "CREATE TABLE IF NOT EXISTS users (" +
                 "id BIGINT PRIMARY KEY AUTO_INCREMENT, " +
                 "name VARCHAR(50) NOT NULL, " +
-                "last_name VARCHAR(50) NOT NULL, " +
+                "lastName VARCHAR(50) NOT NULL, " +
                 "age TINYINT NOT NULL" +
                 ")";
 
@@ -27,7 +24,7 @@ public class UserDaoJDBCImpl implements UserDao {
              Statement statement = connection.createStatement()) {
 
             statement.executeUpdate(sql);
-            System.out.println("Таблица users успешно создана!");
+            System.out.println("Таблица users создана!");
 
         } catch (SQLException e) {
             throw new RuntimeException("Ошибка при создании таблицы: " + e.getMessage(), e);
@@ -35,11 +32,19 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void dropUsersTable() {
+        String sql = "DROP TABLE IF EXISTS users";
+        try (Connection connection = Util.getConnection();
+             Statement statement = connection.createStatement()) {
 
+            statement.executeUpdate(sql);
+            System.out.println("Таблица users удалена!");
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при удалении таблицы: " + e.getMessage(), e);
+        }
     }
 
     public void saveUser(String name, String lastName, byte age) {
-
         String sql = "INSERT INTO users (name, lastName, age) VALUES (?, ?, ?)";
         try(Connection connection = Util.getConnection();
         ) {
@@ -64,7 +69,29 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public List<User> getAllUsers() {
-        return new ArrayList<User>();
+        List<User> users = new ArrayList<>();
+
+        String sql = "SELECT * FROM users";
+
+        try (Connection connection = Util.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet rs = statement.executeQuery(sql)) {
+
+            while (rs.next()) {
+                User user = new User(
+                        rs.getLong("id"),
+                        rs.getString("name"),
+                        rs.getString("last_name"),
+                        rs.getByte("age")
+                );
+                users.add(user);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return users;
     }
 
     public void cleanUsersTable() {
