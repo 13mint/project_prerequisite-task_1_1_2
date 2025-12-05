@@ -1,6 +1,5 @@
 package jm.task.core.jdbc.util;
 
-import jm.task.core.jdbc.model.User;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
@@ -26,7 +25,6 @@ public class HibernateUtil {
 
             MetadataSources sources = new MetadataSources(registry);
             sources.addAnnotatedClass(jm.task.core.jdbc.model.User.class);
-            sources.addAnnotatedClass(User.class);
 
             return sources.buildMetadata().buildSessionFactory();
         } catch (Exception e) {
